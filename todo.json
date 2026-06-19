@@ -1,1 +1,17 @@
-[{"id":"5bdaca4f-a5c8-4011-a2da-5df5d455e049","todo":"Go to market","status":0}]
+[
+    {
+        "id": "5bdaca4f-a5c8-4011-a2da-5df5d455e049",
+        "todo": "Go to market",
+        "status": 2
+    },
+    {
+        "id": "32de1aaa-6b39-4ee9-9e3c-ce2806f3260f",
+        "todo": "also add 2",
+        "status": 0
+    },
+    {
+        "id": "61d54f2f-333d-4e0b-9150-5982a21d75ea",
+        "todo": "also add 3",
+        "status": 0
+    }
+]
