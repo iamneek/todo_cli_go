@@ -13,5 +13,15 @@
         "id": "61d54f2f-333d-4e0b-9150-5982a21d75ea",
         "todo": "also add 3",
         "status": 0
+    },
+    {
+        "id": "57e1470a-15c3-4d68-9b71-9e460ac67746",
+        "todo": "do homework",
+        "status": 1
+    },
+    {
+        "id": "a72cb216-dffc-4c9e-983a-96707970d9ec",
+        "todo": "go to market and bring new stuff from the market",
+        "status": 2
     }
 ]

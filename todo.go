@@ -18,6 +18,16 @@ const (
 	StatusCompleted
 )
 
+const (
+	Reset  = "\033[0m"
+	Red    = "\033[31m"
+	Green  = "\033[32m"
+	Yellow = "\033[33m"
+	Blue   = "\033[34m"
+	Purple = "\033[35m"
+	Cyan   = "\033[36m"
+)
+
 type todo struct {
 	Id         uuid.UUID `json:"id"`
 	Task       string    `json:"todo"`
@@ -53,6 +63,19 @@ func parse_sts(status string) Status {
 		sts = StatusPending
 	}
 	return sts
+}
+
+func parse_sts_code(status Status) string {
+	switch status {
+	case StatusPending:
+		return "Pending  "
+	case StatusInProgress:
+		return "WIP      "
+	case StatusCompleted:
+		return "Completed"
+	default:
+		return "Pending  "
+	}
 }
 
 func check_task_id_length(task_id string) {
@@ -98,9 +121,19 @@ func add_task(task string) {
 
 func list_task() {
 	load_all_todo()
+	fmt.Println()
 	for i := range all_todos {
-		fmt.Println("Task ID: ", all_todos[i].Id, "\nTask: ", all_todos[i].Task, "\nTask Status: ", all_todos[i].TaskStatus)
+		switch all_todos[i].TaskStatus {
+		case StatusPending:
+			fmt.Println(Purple+all_todos[i].Id.String()[:5]+Reset, "[", Yellow+parse_sts_code(all_todos[i].TaskStatus)+Reset, "]", "-", all_todos[i].Task)
+		case StatusInProgress:
+			fmt.Println(Purple+all_todos[i].Id.String()[:5]+Reset, "[", Blue+parse_sts_code(all_todos[i].TaskStatus)+Reset, "]", "-", all_todos[i].Task)
+		case StatusCompleted:
+			fmt.Println(Purple+all_todos[i].Id.String()[:5]+Reset, "[", Green+parse_sts_code(all_todos[i].TaskStatus)+Reset, "]", "-", all_todos[i].Task)
+
+		}
 	}
+	fmt.Println()
 }
 
 func mark_task(status string, taskID string) {
