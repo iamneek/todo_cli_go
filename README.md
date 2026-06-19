@@ -25,12 +25,18 @@ This project is focused on understanding Go fundamentals like slices, structs, f
 
 ---
 
+## Build and Run
+<img width="370" height="65" alt="image" src="https://github.com/user-attachments/assets/614663aa-f66c-4fd3-bcb6-e846ab7536d3" />
+```bash
+go build -o todo .
+```
+
 ## Commands
 
 ### Add a task
 
 ```bash
-todo add "Learn Go"
+./todo add "Learn Go"
 ```
 
 ---
@@ -38,15 +44,15 @@ todo add "Learn Go"
 ### List tasks
 
 ```bash
-todo list
+./todo list
 ```
 
 Filter by status:
 
 ```bash
-todo list pending
-todo list wip
-todo list completed
+./todo list pending
+./todo list wip
+./todo list completed
 ```
 
 ---
@@ -54,13 +60,13 @@ todo list completed
 ### Mark task status
 
 ```bash
-todo mark <id_prefix> <status>
+./todo mark <id_prefix> <status>
 ```
 
 Example:
 
 ```bash
-todo mark a1b2 wip
+./todo mark a1b2 wip
 ```
 
 Valid statuses:
@@ -74,13 +80,13 @@ Valid statuses:
 ### Delete a task
 
 ```bash
-todo del <id_prefix>
+./todo del <id_prefix>
 ```
 
 or
 
 ```bash
-todo delete <id_prefix>
+./todo delete <id_prefix>
 ```
 
 ---
@@ -88,7 +94,7 @@ todo delete <id_prefix>
 ### Help
 
 ```bash
-todo help
+./todo help
 ```
 
 Shows all available commands.
@@ -97,7 +103,7 @@ Shows all available commands.
 
 ## Data Storage
 
-Tasks are stored in a local JSON file:
+Tasks are stored in a local JSON file in the home directory:
 
 ```
 todo.json
