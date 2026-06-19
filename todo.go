@@ -3,14 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/google/uuid"
 )
-
-// TODO: Handle creation of todo.json in case it doesnot exist
 
 type Status int
 
@@ -41,8 +38,9 @@ var all_todos []todo
 func load_all_todo() {
 	content, err := os.ReadFile("todo.json")
 	if err != nil {
-		log.Fatal("Failed to read file.")
-		return
+		fmt.Println("File not found, creating one...")
+		all_todos = []todo{}
+		write_todo_json()
 	}
 	json.Unmarshal(content, &all_todos)
 }
@@ -85,16 +83,23 @@ func parse_sts_code(status Status) string {
 func check_task_id_length(task_id string) {
 	if len(task_id) < 4 {
 		fmt.Println("The ID prefix should be greater than 4 characters.")
-		os.Exit(1)
 		return
 	}
 }
 
 func main() {
 	load_all_todo()
+	if len(os.Args) < 2 {
+		print_help()
+		return
+	}
 	command := os.Args[1]
 	switch command {
 	case "add":
+		if len(os.Args) < 3 {
+			print_help()
+			return
+		}
 		task := os.Args[2]
 		add_task(task)
 	case "list":
@@ -104,18 +109,31 @@ func main() {
 		}
 		list_task(list_mode)
 	case "mark":
+		if len(os.Args) < 4 {
+			print_help()
+			return
+		}
 		task_id := os.Args[2]
-		new_status := os.Args[3]
+		new_status := strings.ToLower(os.Args[3])
+		if new_status != "pending" && new_status != "wip" && new_status != "completed" {
+			print_help()
+			return
+		}
 		check_task_id_length(task_id)
 		mark_task(new_status, task_id)
 
-	case "del":
-	case "delete":
+	case "del", "delete":
+		if len(os.Args) < 3 {
+			print_help()
+			return
+		}
 		task_id := os.Args[2]
 		check_task_id_length(task_id)
 		remove_task(task_id)
+	case "help":
+		print_help()
 	default:
-		fmt.Println("Unknown command")
+		fmt.Println("Unknown command...\nAccess help via: todo help")
 	}
 }
 
@@ -125,6 +143,7 @@ func add_task(task string) {
 	var t = todo{Id: id, Task: task, TaskStatus: StatusPending}
 	all_todos = append(all_todos, t)
 	write_todo_json()
+	fmt.Println("Task: ", task, "\nAdded successfully!")
 }
 
 func list_task(filter string) {
@@ -133,11 +152,9 @@ func list_task(filter string) {
 	filter_status, def := parse_sts(filter)
 
 	for _, t := range all_todos {
-
 		if def != 1 && t.TaskStatus != filter_status {
 			continue
 		}
-
 		color := ""
 		switch t.TaskStatus {
 		case StatusPending:
@@ -147,17 +164,8 @@ func list_task(filter string) {
 		case StatusCompleted:
 			color = Green
 		}
-
-		fmt.Println(
-			Purple+t.Id.String()[:5]+Reset,
-			"[",
-			color+parse_sts_code(t.TaskStatus)+Reset,
-			"]",
-			"-",
-			t.Task,
-		)
+		fmt.Println(Purple+t.Id.String()[:5]+Reset, "[", color+parse_sts_code(t.TaskStatus)+Reset, "]", "-", t.Task)
 	}
-
 	fmt.Println()
 }
 
@@ -168,7 +176,7 @@ func mark_task(status string, taskID string) {
 	for i := range all_todos {
 		if strings.HasPrefix(all_todos[i].Id.String(), taskID) {
 			all_todos[i].TaskStatus = sts
-			fmt.Println(all_todos[i])
+			fmt.Println("Status for Task: ", all_todos[i].Id, " updated to ", strings.ToUpper(parse_sts_code(all_todos[i].TaskStatus)))
 		}
 	}
 	write_todo_json()
@@ -183,4 +191,31 @@ func remove_task(taskID string) {
 		}
 	}
 	write_todo_json()
+}
+
+func print_help() {
+	fmt.Println(`
+TODO CLI - Usage Guide
+
+Commands:
+
+  add <task>
+      Add a new todo task
+      Example: todo add "Learn Go"
+
+  list [all|pending|wip|completed]
+      List all tasks or filter by status
+      Example: todo list
+      Example: todo list pending
+
+  mark <id_prefix> <pending|wip|completed>
+      Update status of a task
+      Example: todo mark a1b2 wip
+
+  del <id_prefix>
+      Delete a task
+      Example: todo del a1b2
+
+  help
+      Show this help menu`)
 }
