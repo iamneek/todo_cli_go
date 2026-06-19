@@ -4,7 +4,8 @@ A simple command-line todo application built in Go to learn core language concep
 
 This project is focused on understanding Go fundamentals like slices, structs, file handling, CLI arguments, and JSON serialization.
 
----
+<div align="center"><img width="724" height="153" alt="image" src="https://github.com/user-attachments/assets/cbac9f95-5a01-4d6c-a6ce-d9c80b7ca9d0" />
+</div>
 
 ## Features
 
