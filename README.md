@@ -27,6 +27,7 @@ This project is focused on understanding Go fundamentals like slices, structs, f
 
 ## Build and Run
 <img width="370" height="65" alt="image" src="https://github.com/user-attachments/assets/614663aa-f66c-4fd3-bcb6-e846ab7536d3" />
+
 ```bash
 go build -o todo .
 ```
