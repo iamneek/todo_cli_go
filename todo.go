@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/uuid"
@@ -35,8 +36,19 @@ type todo struct {
 
 var all_todos []todo
 
+func get_json_path() string {
+	homeDir, err := os.UserHomeDir()
+
+	if err != nil {
+		fmt.Println("Error finding home directory:", err)
+		return "todo.json"
+	}
+	filePath := filepath.Join(homeDir, "todo.json")
+	return filePath
+}
+
 func load_all_todo() {
-	content, err := os.ReadFile("todo.json")
+	content, err := os.ReadFile(get_json_path())
 	if err != nil {
 		fmt.Println("File not found, creating one...")
 		all_todos = []todo{}
@@ -47,7 +59,7 @@ func load_all_todo() {
 
 func write_todo_json() {
 	data, _ := json.Marshal(all_todos)
-	os.WriteFile("todo.json", data, 0644)
+	os.WriteFile(get_json_path(), data, 0644)
 }
 
 func parse_sts(status string) (Status, int) {
