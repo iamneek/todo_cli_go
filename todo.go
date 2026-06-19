@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO: Handle creation of todo.json in case it doesnot exist
+
 type Status int
 
 const (
@@ -50,8 +52,9 @@ func write_todo_json() {
 	os.WriteFile("todo.json", data, 0644)
 }
 
-func parse_sts(status string) Status {
+func parse_sts(status string) (Status, int) {
 	var sts Status
+	var def int = 0
 	switch strings.ToLower(status) {
 	case "completed":
 		sts = StatusCompleted
@@ -61,20 +64,21 @@ func parse_sts(status string) Status {
 		sts = StatusPending
 	default:
 		sts = StatusPending
+		def = 1
 	}
-	return sts
+	return sts, def
 }
 
 func parse_sts_code(status Status) string {
 	switch status {
 	case StatusPending:
-		return "Pending  "
+		return " Pending "
 	case StatusInProgress:
-		return "WIP      "
+		return "   WIP   "
 	case StatusCompleted:
 		return "Completed"
 	default:
-		return "Pending  "
+		return " Pending "
 	}
 }
 
@@ -94,7 +98,11 @@ func main() {
 		task := os.Args[2]
 		add_task(task)
 	case "list":
-		list_task()
+		list_mode := "all"
+		if len(os.Args) == 3 {
+			list_mode = os.Args[2]
+		}
+		list_task(list_mode)
 	case "mark":
 		task_id := os.Args[2]
 		new_status := os.Args[3]
@@ -119,27 +127,44 @@ func add_task(task string) {
 	write_todo_json()
 }
 
-func list_task() {
+func list_task(filter string) {
 	load_all_todo()
 	fmt.Println()
-	for i := range all_todos {
-		switch all_todos[i].TaskStatus {
-		case StatusPending:
-			fmt.Println(Purple+all_todos[i].Id.String()[:5]+Reset, "[", Yellow+parse_sts_code(all_todos[i].TaskStatus)+Reset, "]", "-", all_todos[i].Task)
-		case StatusInProgress:
-			fmt.Println(Purple+all_todos[i].Id.String()[:5]+Reset, "[", Blue+parse_sts_code(all_todos[i].TaskStatus)+Reset, "]", "-", all_todos[i].Task)
-		case StatusCompleted:
-			fmt.Println(Purple+all_todos[i].Id.String()[:5]+Reset, "[", Green+parse_sts_code(all_todos[i].TaskStatus)+Reset, "]", "-", all_todos[i].Task)
+	filter_status, def := parse_sts(filter)
 
+	for _, t := range all_todos {
+
+		if def != 1 && t.TaskStatus != filter_status {
+			continue
 		}
+
+		color := ""
+		switch t.TaskStatus {
+		case StatusPending:
+			color = Yellow
+		case StatusInProgress:
+			color = Blue
+		case StatusCompleted:
+			color = Green
+		}
+
+		fmt.Println(
+			Purple+t.Id.String()[:5]+Reset,
+			"[",
+			color+parse_sts_code(t.TaskStatus)+Reset,
+			"]",
+			"-",
+			t.Task,
+		)
 	}
+
 	fmt.Println()
 }
 
 func mark_task(status string, taskID string) {
 	load_all_todo()
 	var sts Status
-	sts = parse_sts(status)
+	sts, _ = parse_sts(status)
 	for i := range all_todos {
 		if strings.HasPrefix(all_todos[i].Id.String(), taskID) {
 			all_todos[i].TaskStatus = sts
